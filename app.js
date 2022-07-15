@@ -4,7 +4,7 @@ const express=require('express')
 // 引入路由
 const router=require('./router')
 const routers=require('./router/userinfo')
-
+const artiroute=require('./router/article')
 const multer=require('multer')
 
 // 创建服务器
@@ -29,6 +29,8 @@ app.use(expressJWT({secret:config.jwtSecretKey,algorithms: ["HS256"] }).unless({
 app.use('/api',router)
 
 app.use('/my',routers)
+
+app.use('/my/article',artiroute)
 
 // 处理图片上传
 var storage = multer.diskStorage({
