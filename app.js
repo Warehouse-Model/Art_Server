@@ -5,6 +5,8 @@ const express=require('express')
 const router=require('./router')
 const routers=require('./router/userinfo')
 const artiroute=require('./router/article')
+const release=require('./router/release')
+const uselist=require('./router/users')
 const multer=require('multer')
 
 // 创建服务器
@@ -23,7 +25,7 @@ app.use('/upload',express.static('./upload'))
 const {expressjwt:expressJWT}=require('express-jwt')
 const config=require('./config')
 
-app.use(expressJWT({secret:config.jwtSecretKey,algorithms: ["HS256"] }).unless({ path:[/^\/api/,/^\/file/]}))
+app.use(expressJWT({secret:config.jwtSecretKey,algorithms: ["HS256"] }).unless({ path:[/^\/api/,/^\/file/,/^\/upload/]}))
 
 // 注册路由中级件
 app.use('/api',router)
@@ -31,6 +33,10 @@ app.use('/api',router)
 app.use('/my',routers)
 
 app.use('/my/article',artiroute)
+
+app.use('/my/article',release)
+
+app.use('/my/users',uselist)
 
 // 处理图片上传
 var storage = multer.diskStorage({
@@ -41,6 +47,7 @@ var storage = multer.diskStorage({
 
     //确定图片存储时的名字,注意，如果使用原名，可能会造成再次上传同一张图片的时候的冲突
     filename: function (req, file, cb) {
+    
         cb(null, Date.now() + file.originalname)
     }
 
@@ -49,7 +56,7 @@ const upload = multer({ storage: storage })
 app.use('/file/upload',upload.single('file'),(req,res)=>{
     const url = `http://127.0.0.1:3000/upload/${req.file.filename}`
     res.send({
-        status: 200,
+        errno: 0, 
         msg: "上传成功",
         url
     })
